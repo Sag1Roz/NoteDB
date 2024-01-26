@@ -4,7 +4,7 @@ import { Note } from "../dataBase/Note";
 
 const router = Router();
 
-router.post("/info", async (req, res) => {
+router.post("/new", async (req, res) => {
   try {
     const response = noteSchema.safeParse(req.body);
     if (!response.success) throw response.error;
@@ -12,6 +12,24 @@ router.post("/info", async (req, res) => {
     const note = new Note({ title, description });
     await note.save();
     return res.json({ success: true, ...response.data });
+  } catch (error) {
+    return res.json({ success: false, error });
+  }
+});
+
+router.get("/getAllNotes", async (req, res) => {
+  try {
+    const allNotes = await Note.find();
+    return res.json({ success: true, ...allNotes });
+  } catch (error) {
+    return res.json({ success: false, error });
+  }
+});
+
+router.delete("/deleteAllNotes", async (req, res) => {
+  try {
+    await Note.deleteMany();
+    return res.json({ success: true });
   } catch (error) {
     return res.json({ success: false, error });
   }

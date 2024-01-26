@@ -15,4 +15,4 @@ app.listen(5000, () => {
 
 app.use("/all-users", UserRouter);
 app.use("/auth", AuthRouter);
-app.use("/note", NoteRouter);
+app.use("/notes", NoteRouter);
