@@ -5,19 +5,27 @@ const NoteSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+
   description: {
     type: String,
     require: true,
   },
+
   createdAt: {
     type: Date,
     require: true,
     default: Date.now(),
   },
+
   updatedAt: {
     type: Date,
     require: true,
     default: Date.now(),
+  },
+
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+    require: true,
   },
 });
 

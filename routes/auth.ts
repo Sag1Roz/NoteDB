@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { loginSchema, registerSchema } from "../validations/auth";
-import { User } from "../dataBase/user";
+import { User } from "../dataBase/User";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const router = Router();
 
@@ -17,7 +21,9 @@ router.post("/login", async (req, res) => {
     const isValid = await bcrypt.compare(password, user.password!);
     if (!isValid) throw "Incorrect email or password";
 
-    return res.json({ success: true });
+    const token = jwt.sign(email, process.env.JTW_SECRET!);
+
+    return res.json({ success: true, token });
   } catch (error) {
     return res.json({ success: false, error });
   }

@@ -1,15 +1,32 @@
 import { Router } from "express";
 import { noteSchema } from "../validations/note";
 import { Note } from "../dataBase/Note";
+import authMiddleWere from "../middlewares/authMiddleWere";
 
 const router = Router();
 
-router.post("/new", async (req, res) => {
+router.get("/", async (req, res) => {
+  try {
+    const allNotes = await Note.find();
+    return res.json({ success: true, ...allNotes });
+  } catch (error) {
+    return res.json({ success: false, error });
+  }
+});
+
+router.post("/new", authMiddleWere, async (req, res) => {
   try {
     const response = noteSchema.safeParse(req.body);
     if (!response.success) throw response.error;
     const { description, title } = response.data;
-    const note = new Note({ title, description });
+
+    if (!req.currentUser) throw "You must login to create a note";
+
+    const note = new Note({
+      title,
+      description,
+      createdBy: req.currentUser?.id,
+    });
     await note.save();
     return res.json({ success: true, ...response.data });
   } catch (error) {
@@ -17,10 +34,11 @@ router.post("/new", async (req, res) => {
   }
 });
 
-router.get("/getAllNotes", async (req, res) => {
+router.get("/my-notes", authMiddleWere, async (req, res) => {
   try {
-    const allNotes = await Note.find();
-    return res.json({ success: true, ...allNotes });
+    if (!req.currentUser) throw "You must login to create a note";
+    const notes = await Note.find({ createdBy: req.currentUser.id });
+    return res.json({ success: true, ...notes });
   } catch (error) {
     return res.json({ success: false, error });
   }
